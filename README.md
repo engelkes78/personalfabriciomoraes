@@ -1,1 +1,1 @@
-arquivos essoais para elaboração de treinos
+arquivos pessoais para elaboração de treinos
