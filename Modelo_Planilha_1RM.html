@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planilha de 1RM e Cargas de Treino</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Define a fonte Inter para todo o corpo do documento */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Estilos para a tabela */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0; /* Cor de borda do Tailwind gray-200 */
+        }
+        th {
+            background-color: #f8fafc; /* Cor de fundo do Tailwind gray-50 */
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.875rem; /* text-sm */
+            color: #475569; /* Cor do texto do Tailwind slate-600 */
+        }
+        tr:nth-child(even) {
+            background-color: #f1f5f9; /* Cor de fundo do Tailwind slate-100 para linhas pares */
+        }
+        tr:hover {
+            background-color: #e2e8f0; /* Cor de fundo do Tailwind gray-200 ao passar o mouse */
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center py-10 px-4">
+    <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-4xl border border-gray-200">
+        <h1 class="text-4xl font-extrabold text-center text-gray-800 mb-8">
+            📈 Planilha de Treino de Força
+        </h1>
+
+        <!-- Seção para Adicionar Novo Teste de 1RM -->
+        <div class="mb-8 p-6 bg-blue-50 rounded-lg shadow-inner border border-blue-200">
+            <h2 class="text-2xl font-bold text-blue-800 mb-4">Adicionar Novo Teste de 1RM</h2>
+            <form id="add1RMForm" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label for="exercise" class="block text-sm font-medium text-gray-700 mb-1">Exercício:</label>
+                    <input type="text" id="exercise" name="exercise" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out">
+                </div>
+                <div>
+                    <label for="date" class="block text-sm font-medium text-gray-700 mb-1">Data:</label>
+                    <input type="date" id="date" name="date" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out">
+                </div>
+                <div>
+                    <label for="oneRmValue" class="block text-sm font-medium text-gray-700 mb-1">1RM (kg):</label>
+                    <input type="number" id="oneRmValue" name="oneRmValue" step="0.5" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out">
+                </div>
+                <div class="md:col-span-3 flex justify-end mt-2">
+                    <button type="submit"
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Adicionar 1RM
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Seção de Registro de Testes de 1RM -->
+        <div class="mb-8 p-6 bg-gray-50 rounded-lg shadow-inner border border-gray-200">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Histórico de Testes de 1RM</h2>
+            <div id="oneRmHistory" class="overflow-x-auto">
+                <!-- Tabela de histórico de 1RM será renderizada aqui pelo JS -->
+            </div>
+        </div>
+
+        <!-- Seção de Cargas de Treino Calculadas -->
+        <div class="p-6 bg-green-50 rounded-lg shadow-inner border border-green-200">
+            <h2 class="text-2xl font-bold text-green-800 mb-4">Cargas de Treino Calculadas (Baseado no Último 1RM)</h2>
+            <p class="text-sm text-gray-600 mb-4">
+                As cargas abaixo são calculadas com base no seu **último 1RM registrado** para cada exercício.
+            </p>
+
+            <!-- Tabela para Semana de Choque -->
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-green-700 mb-2">Semana de Choque (85% do 1RM)</h3>
+                <div id="shockWeekLoads" class="overflow-x-auto">
+                    <!-- Tabela de cargas de choque será renderizada aqui pelo JS -->
+                </div>
+            </div>
+
+            <!-- Tabela para Semanas Ordinárias -->
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-green-700 mb-2">Semanas Ordinárias (75% do 1RM)</h3>
+                <div id="ordinaryWeekLoads" class="overflow-x-auto">
+                    <!-- Tabela de cargas ordinárias será renderizada aqui pelo JS -->
+                </div>
+            </div>
+
+            <!-- Tabela para Semana de Recuperação -->
+            <div>
+                <h3 class="text-xl font-semibold text-green-700 mb-2">Semana de Recuperação (60-70% do 1RM)</h3>
+                <div id="recoveryWeekLoads" class="overflow-x-auto">
+                    <!-- Tabela de cargas de recuperação será renderizada aqui pelo JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Array para armazenar os resultados dos testes de 1RM
+        let oneRmResults = [];
+
+        // Função para formatar a data para exibição
+        const formatDate = (dateString) => {
+            const [year, month, day] = dateString.split('-');
+            return `${day}/${month}/${year}`;
+        };
+
+        // Função para renderizar a tabela de histórico de 1RM
+        const renderOneRmHistory = () => {
+            const container = document.getElementById('oneRmHistory');
+            if (oneRmResults.length === 0) {
+                container.innerHTML = '<p class="text-gray-500">Nenhum teste de 1RM registrado ainda.</p>';
+                return;
+            }
+
+            // Ordena os resultados por data (mais recente primeiro) e depois por exercício
+            const sortedResults = [...oneRmResults].sort((a, b) => {
+                const dateA = new Date(a.date);
+                const dateB = new Date(b.date);
+                if (dateA < dateB) return 1;
+                if (dateA > dateB) return -1;
+                return a.exercise.localeCompare(b.exercise);
+            });
+
+            let tableHtml = `
+                <table class="min-w-full bg-white rounded-lg shadow-md overflow-hidden">
+                    <thead>
+                        <tr>
+                            <th class="py-3 px-4">Data do Teste</th>
+                            <th class="py-3 px-4">Exercício</th>
+                            <th class="py-3 px-4">1RM (kg)</th>
+                            <th class="py-3 px-4">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            sortedResults.forEach((result, index) => {
+                tableHtml += `
+                    <tr>
+                        <td class="py-3 px-4">${formatDate(result.date)}</td>
+                        <td class="py-3 px-4">${result.exercise}</td>
+                        <td class="py-3 px-4">${result.oneRmValue.toFixed(1)}</td>
+                        <td class="py-3 px-4">
+                            <button onclick="removeOneRmEntry(${index})"
+                                class="bg-red-500 hover:bg-red-600 text-white text-sm py-1 px-3 rounded-md shadow-sm transition duration-200 ease-in-out transform hover:scale-105">
+                                Remover
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            tableHtml += `
+                    </tbody>
+                </table>
+            `;
+            container.innerHTML = tableHtml;
+        };
+
+        // Função para remover uma entrada de 1RM
+        const removeOneRmEntry = (indexToRemove) => {
+            // Encontra o item original no array oneRmResults usando o item ordenado
+            const itemToRemove = [...oneRmResults].sort((a, b) => {
+                const dateA = new Date(a.date);
+                const dateB = new Date(b.date);
+                if (dateA < dateB) return 1;
+                if (dateA > dateB) return -1;
+                return a.exercise.localeCompare(b.exercise);
+            })[indexToRemove];
+
+            const originalIndex = oneRmResults.findIndex(item =>
+                item.date === itemToRemove.date &&
+                item.exercise === itemToRemove.exercise &&
+                item.oneRmValue === itemToRemove.oneRmValue
+            );
+
+            if (originalIndex > -1) {
+                oneRmResults.splice(originalIndex, 1);
+                renderOneRmHistory();
+                calculateAndRenderLoads(); // Recalcula as cargas após a remoção
+            }
+        };
+
+
+        // Função para calcular e renderizar as cargas de treino
+        const calculateAndRenderLoads = () => {
+            // Obter o último 1RM para cada exercício
+            const latestOneRms = {};
+            oneRmResults.forEach(result => {
+                if (!latestOneRms[result.exercise] || new Date(result.date) > new Date(latestOneRms[result.exercise].date)) {
+                    latestOneRms[result.exercise] = result;
+                }
+            });
+
+            const exercises = Object.keys(latestOneRms).sort(); // Ordena os exercícios alfabeticamente
+
+            // Função auxiliar para renderizar tabelas de carga
+            const renderLoadTable = (containerId, percentageLow, percentageHigh = null) => {
+                const container = document.getElementById(containerId);
+                if (exercises.length === 0) {
+                    container.innerHTML = '<p class="text-gray-500">Adicione testes de 1RM para calcular as cargas.</p>';
+                    return;
+                }
+
+                let tableHtml = `
+                    <table class="min-w-full bg-white rounded-lg shadow-md overflow-hidden">
+                        <thead>
+                            <tr>
+                                <th class="py-3 px-4">Exercício</th>
+                                <th class="py-3 px-4">1RM Atual (kg)</th>
+                                <th class="py-3 px-4">Carga Sugerida (kg)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                exercises.forEach(exercise => {
+                    const oneRm = latestOneRms[exercise].oneRmValue;
+                    let suggestedLoad;
+                    if (percentageHigh) {
+                        const low = (oneRm * percentageLow / 100).toFixed(1);
+                        const high = (oneRm * percentageHigh / 100).toFixed(1);
+                        suggestedLoad = `${low} - ${high}`;
+                    } else {
+                        suggestedLoad = (oneRm * percentageLow / 100).toFixed(1);
+                    }
+                    tableHtml += `
+                        <tr>
+                            <td class="py-3 px-4">${exercise}</td>
+                            <td class="py-3 px-4">${oneRm.toFixed(1)}</td>
+                            <td class="py-3 px-4">${suggestedLoad}</td>
+                        </tr>
+                    `;
+                });
+                tableHtml += `
+                        </tbody>
+                    </table>
+                `;
+                container.innerHTML = tableHtml;
+            };
+
+            // Renderiza as tabelas para cada fase
+            renderLoadTable('shockWeekLoads', 85);
+            renderLoadTable('ordinaryWeekLoads', 75);
+            renderLoadTable('recoveryWeekLoads', 60, 70);
+        };
+
+        // Event listener para o formulário de adicionar 1RM
+        document.getElementById('add1RMForm').addEventListener('submit', (event) => {
+            event.preventDefault(); // Previne o recarregamento da página
+
+            const exercise = document.getElementById('exercise').value.trim();
+            const date = document.getElementById('date').value;
+            const oneRmValue = parseFloat(document.getElementById('oneRmValue').value);
+
+            if (exercise && date && !isNaN(oneRmValue) && oneRmValue > 0) {
+                oneRmResults.push({ exercise, date, oneRmValue });
+                // Limpa o formulário
+                document.getElementById('add1RMForm').reset();
+                // Re-renderiza as tabelas
+                renderOneRmHistory();
+                calculateAndRenderLoads();
+            } else {
+                alert('Por favor, preencha todos os campos corretamente.');
+            }
+        });
+
+        // Chamada inicial para renderizar as tabelas (caso haja dados pré-existentes ou para exibir as mensagens iniciais)
+        document.addEventListener('DOMContentLoaded', () => {
+            renderOneRmHistory();
+            calculateAndRenderLoads();
+        });
+    </script>
+</body>
+</html>
