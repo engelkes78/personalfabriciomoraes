@@ -1,1 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Treinos de Alunos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🏋️ Controle de Ciclos de Treino</h1>
 
+        <div class="main-actions">
+            <button id="addStudentBtn" class="add-btn">➕ Adicionar Novo Aluno</button>
+            <input type="text" id="studentSearchInput" placeholder="Buscar aluno...">
+        </div>
+
+        <div id="studentFormContainer" class="form-container" style="display: none;">
+            <h2 id="studentFormTitle">Adicionar Novo Aluno</h2>
+            <form id="studentForm" class="data-form">
+                <input type="hidden" id="studentIdInput">
+                <label for="studentNameInput">Nome do Aluno:</label>
+                <input type="text" id="studentNameInput" required>
+
+                <button type="submit" class="save-btn">Salvar Aluno</button>
+                <button type="button" class="cancel-btn">Cancelar</button>
+            </form>
+        </div>
+
+        <div class="student-list">
+            <h2>Meus Alunos</h2>
+            <div id="studentCardsContainer">
+                <p id="noStudentsMessage">Nenhum aluno cadastrado. Adicione um novo aluno!</p>
+            </div>
+        </div>
+
+        <div class="student-details" id="studentDetails" style="display: none;">
+            <h2 id="studentNameDisplay">Detalhes do Aluno: (Selecione um Aluno)</h2>
+
+            <div class="actions-details">
+                <button id="addCycleBtn" class="add-btn">➕ Adicionar Novo Ciclo</button>
+                <button id="addRmTestBtn" class="add-btn">➕ Adicionar Teste de 1RM</button>
+            </div>
+
+            <div id="cycleFormContainer" class="form-container" style="display: none;">
+                <h3 id="cycleFormTitle">Adicionar Novo Ciclo</h3>
+                <form id="cycleForm" class="data-form">
+                    <input type="hidden" id="cycleIdInput">
+                    <label for="cycleNameInput">Nome/Número do Ciclo:</label>
+                    <input type="text" id="cycleNameInput" required>
+
+                    <label for="cycleStartDateInput">Data de Início:</label>
+                    <input type="date" id="cycleStartDateInput" required>
+
+                    <label for="cycleEndDateInput">Data de Fim Prevista:</label>
+                    <input type="date" id="cycleEndDateInput">
+
+                    <label for="cycleStatusInput">Status do Ciclo:</label>
+                    <select id="cycleStatusInput">
+                        <option value="Ativo">Ativo</option>
+                        <option value="Concluido">Concluído</option>
+                        <option value="Planejado">Planejado</option>
+                        <option value="Interrompido">Interrompido</option>
+                        <option value="A definir">A definir</option>
+                    </select>
+
+                    <label for="cycleObjectiveInput">Objetivo do Ciclo:</label>
+                    <textarea id="cycleObjectiveInput" rows="3"></textarea>
+
+                    <button type="submit" class="save-btn">Salvar Ciclo</button>
+                    <button type="button" class="cancel-btn">Cancelar</button>
+                </form>
+            </div>
+
+            <div id="rmTestFormContainer" class="form-container" style="display: none;">
+                <h3 id="rmTestFormTitle">Adicionar Novo Teste de 1RM</h3>
+                <form id="rmTestForm" class="data-form">
+                    <input type="hidden" id="rmTestIdInput">
+                    <label for="rmTestExerciseInput">Exercício:</label>
+                    <input type="text" id="rmTestExerciseInput" required>
+
+                    <label for="rmTestDateInput">Data do Teste:</label>
+                    <input type="date" id="rmTestDateInput" required>
+
+                    <label for="rmTestValueInput">1RM (kg):</label>
+                    <input type="number" id="rmTestValueInput" step="0.5" required>
+
+                    <label for="rmTestNotesInput">Observações:</label>
+                    <textarea id="rmTestNotesInput" rows="2"></textarea>
+
+                    <button type="submit" class="save-btn">Salvar Teste</button>
+                    <button type="button" class="cancel-btn">Cancelar</button>
+                </form>
+            </div>
+
+            <h3>Histórico de Ciclos de Treino</h3>
+            <table class="cycles-table">
+                <thead>
+                    <tr>
+                        <th>Ciclo</th>
+                        <th>Início</th>
+                        <th>Fim</th>
+                        <th>Duração</th>
+                        <th>Status</th>
+                        <th>Objetivo</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="cyclesBody">
+                    <tr><td colspan="7" class="no-data">Nenhum ciclo cadastrado para este aluno.</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Histórico de Testes de 1RM</h3>
+            <table class="rm-tests-table">
+                <thead>
+                    <tr>
+                        <th>Exercício</th>
+                        <th>Data</th>
+                        <th>1RM (kg)</th>
+                        <th>Observações</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="rmTestsBody">
+                    <tr><td colspan="5" class="no-data">Nenhum teste de 1RM cadastrado para este aluno.</td></tr>
+                </tbody>
+            </table>
+
+            <div class="notes-section">
+                <p><strong>Observações Gerais do Aluno:</strong></p>
+                <textarea id="generalNotesInput" rows="4"></textarea>
+                <button id="saveGeneralNotesBtn" class="save-btn">Salvar Observações</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
